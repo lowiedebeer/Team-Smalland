@@ -1,6 +1,7 @@
 class Train():
+
+    # Defining train_location, traject_length and destination
     def __init__(self, current_station, traject_length):
-       
         self.train = current_station
         self.traject_length = traject_length # In minuten
         self.list_of_stations = [current_station]
