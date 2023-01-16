@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import random
 
 from train import Train
-from station import Station
+from class_station import Station
+
 
 class Experiment():
 
@@ -28,8 +29,7 @@ class Experiment():
             while current_station in stations:
                 current_station = random.sample(self.coordinates_dict.keys(), 1)
 
-            possible_destinations = self.connections[current_station]
-            train = Train(str(current_station), random.sample(possible_destinations.keys(), 1))
+            train = Train(str(current_station[0]), self.connections)
             trains_list.append(train)
         self.trains_list = trains_list
 
