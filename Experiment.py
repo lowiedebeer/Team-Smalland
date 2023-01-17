@@ -17,9 +17,9 @@ class Experiment():
         self.add_stations(self.connections)
         self.add_trains(number_of_trains)
         self.draw(self.trains_list)
-        while self.minutes_left > 0:
-            self.step()
-            self.draw(self.trains_list)
+        # while self.minutes_left > 0:
+        #     self.step()
+        #     self.draw(self.trains_list)
 
     #adds station objects
     def add_stations(self, connections):
@@ -41,6 +41,7 @@ class Experiment():
                 current_station = random.sample(self.coordinates_dict.keys(), 1)
 
             train = Train(str(current_station[0]), self.connections)
+
             trains_list.append(train)
         self.trains_list = trains_list
 
@@ -84,13 +85,18 @@ class Experiment():
     def step(self):
         smallest_traject = 50
         for train in self.trains_list:
-            if train.traject_length < smallest_traject:
-                smallest_traject = train.traject_length
-        for train in self.trains_list:
-            train.traject_length -= smallest_traject
-            if train.traject_length == 0:
-                train.movement()
-        self.minutes_left -= smallest_traject
+            train.movement()
+
+        #     print(train.traject_length)
+        #     print(train.current_station)
+        #     print(train.destination[0])
+        #     if train.traject_length < smallest_traject:
+        #         smallest_traject = train.traject_length
+        # for train in self.trains_list:
+        #     train.traject_length -= smallest_traject
+        #     if train.traject_length == 0:
+        #         train.movement()
+        # self.minutes_left -= smallest_traject
 
     def draw(self, trains_list):
         self.trains_list = trains_list
@@ -123,7 +129,11 @@ class Experiment():
     def run(self, iterations):
         for i in range(iterations):
             self.step()
-            self.draw()
+
+        for train in self.trains_list:
+            print(train.list_of_stations)
+
+
 
 my_experiment = Experiment(7)
 my_experiment.run(120)

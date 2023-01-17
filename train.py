@@ -9,7 +9,7 @@ class Train():
         self.location = 0
         self.list_of_destinations = list_of_destinations
         self.destination = self.destinations()
-        self.traject_length = self.destination[1]
+
 
     
     def destinations(self):
@@ -23,7 +23,6 @@ class Train():
         
         # Randomly choosing a new destination
         new_destination = random.choice(list(destinations_per_train.items()))
-
         return new_destination
     
     def movement(self):
@@ -32,16 +31,15 @@ class Train():
         is reached the station will be added to a list of stations on its traject.
         """
         self.location += 1
-       
-       # If the distance between the train and the station is 0 add it to the list of stations
+        
+        # If the distance between the train and the station is 0 add it to the list of stations
         if self.destination[1] - self.location == 0:
-            print(self.destination[0])
             self.current_station = self.destination[0]
             self.list_of_stations.append(self.current_station)
 
             # Determining the next destination
-            self.traject_length = self.destinations()
-            
+            self.destination = self.destinations()
+            self.location = 0
         return self.list_of_stations
 
 
