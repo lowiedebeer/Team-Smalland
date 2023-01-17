@@ -4,11 +4,12 @@ class Train():
 
     # Defining train_location, traject_length and destination
     def __init__(self, current_station, list_of_destinations):
-        self.train = current_station # In minuten
+        self.current_station = current_station # In minuten
         self.list_of_stations = [current_station]
         self.location = 0
         self.list_of_destinations = list_of_destinations
         self.destination = self.destinations()
+        self.traject_length = self.destination[1]
 
     
     def destinations(self):
@@ -18,7 +19,7 @@ class Train():
         """
 
         # Loop through all the options and save the possible destinations
-        destinations_per_train = self.list_of_destinations[self.train]
+        destinations_per_train = self.list_of_destinations[self.current_station]
         
         # Randomly choosing a new destination
         new_destination = random.choice(list(destinations_per_train.items()))
@@ -34,8 +35,9 @@ class Train():
        
        # If the distance between the train and the station is 0 add it to the list of stations
         if self.destination[1] - self.location == 0:
-            self.train = self.traject_length[0]
-            self.list_of_stations.append(self.train)
+            print(self.destination[0])
+            self.current_station = self.destination[0]
+            self.list_of_stations.append(self.current_station)
 
             # Determining the next destination
             self.traject_length = self.destinations()
