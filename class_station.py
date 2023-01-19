@@ -10,15 +10,15 @@ class Station():
 
     def next_station(self):
         '''
-        This function takes a csv-file of the distance between stations as input, 
-        loops over this to output a list of dictionaries with next station and distance 
+        This function takes a csv-file of the distance between stations as input,
+        loops over this to output a list of dictionaries with next station and distance
         as a value in the form of a tuple.
         '''
 
         # Empty list for all next_station values
         list_of_connections = []
 
-        # Loop over the dataframe to append all stations as dictionaries to list 
+        # Loop over the dataframe to append all stations as dictionaries to list
         for i in range(len(self.connections['station1'])):
                     next_station1 = {}
                     next_station1[self.connections["station1"][i]] = (self.connections["station2"][i], self.connections["distance"][i])

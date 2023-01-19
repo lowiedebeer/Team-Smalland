@@ -13,7 +13,7 @@ class Experiment():
         self.stations_list = []
         self.ridden_history = []
         self.minutes_left = 120
-        self.traject_list = []
+        self.train_route_list = []
         self.connections = self.init_dicts()
         self.x_list, self.y_list, self.coordinates_dict = self.init_station_list()
         self.add_stations()
@@ -24,7 +24,7 @@ class Experiment():
 
     def add_stations(self, ):
         """
-        Adding stations 
+        Adding stations
         """
 
         # Looping over the length of the given dict of the stations
@@ -36,7 +36,7 @@ class Experiment():
         """
         Adding trains from the imported train class
         """
-        
+
         # Making trains for the given amount of total trains
         for i in range(number_of_trains):
             current_station = random.sample(self.coordinates_dict.keys(), 1)
@@ -62,16 +62,19 @@ class Experiment():
         return dict_of_connections
 
     def init_station_list(self):
-        station_map = pd.read_csv('StationsHollandPositie.csv')
-        self.station_map = station_map
+        """
+        Create a dictionary of the stations with their coordinates as values
+        """
 
-        x_list = list(station_map['x'])
-        y_list = list(station_map['y'])
-        coordinates_dict = {}
+        # Read the csv-file with the geographical locations of the stations
+        self.station_map = pd.read_csv('StationsHollandPositie.csv')
 
-        for i in range(len(station_map['x'])):
-            coordinates_dict[station_map['station'][i]] = [station_map['x'][i], station_map['y'][i]]
-        return x_list, y_list, coordinates_dict
+        self.coordinates_dict = {}
+
+        # Loop over the coordinates and append to dictionary
+        for i in range(len(self.station_map['x'])):
+            coordinates_dict[self.station_map['station'][i]] = [self.station_map['x'][i], self.station_map['y'][i]]
+        return self.coordinates_dict
 
 
     def step(self):
@@ -83,26 +86,29 @@ class Experiment():
 
 
     def draw(self):
-        trains_list = self.trains_list
-        traject_map = pd.read_csv('ConnectiesHolland.csv')
-        station_map = pd.read_csv('StationsHollandPositie.csv')
+        """
+        Plot the stations and trajectories of trains between stations.
+        """
 
-        x_list = list(station_map['x'])
-        y_list = list(station_map['y'])
+        # Read the csv-file of the connections between stations into
+        # a dataframe for each csv-file.
+        train_route_map = pd.read_csv('ConnectiesHolland.csv')
 
-        traject_list = []
-        for train in trains_list:
-            traject_list.append({train.current_station, train.destination[0]})
+        # Making a list of x and y values of the positions of the stations
+        # to later be able to plot the stations.
+        x_list = list(self.station_map['x'])
+        y_list = list(self.station_map['y'])
 
-        coordinates_dict = {}
+        # Keep track of the stations a train has passed on its route
+        for train in self.trains_list:
+            self.train_route_list.append({train.current_station, train.destination[0]})
 
-        for i in range(len(self.station_map['x'])):
-            coordinates_dict[station_map['station'][i]] = [station_map['x'][i], station_map['y'][i]]
 
         for i in range(len(traject_map['station1'])):
-            x_values = [coordinates_dict[traject_map['station1'][i]][0], coordinates_dict[traject_map['station2'][i]][0]]
-            y_values = [coordinates_dict[traject_map['station1'][i]][1], coordinates_dict[traject_map['station2'][i]][1]]
-            if {traject_map['station1'][i], traject_map['station2'][i]} in traject_list:
+            x_values = [self.coordinates_dict[train_route_map['station1'][i]][0], self.coordinates_dict[train_route_map['station2'][i]][0]]
+            y_values = [self.coordinates_dict[train_route_map['station1'][i]][1], self.coordinates_dict[train_route_map['station2'][i]][1]]
+
+            if {train_route_map['station1'][i], train_route_map['station2'][i]} in self.train_route_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
             else:
                 self.ax.plot(x_values, y_values, 'bo', linestyle="--")
@@ -111,7 +117,7 @@ class Experiment():
         plt.draw()
         plt.pause(0.01)
         self.ax.cla()
-        
+
     def run(self, iterations):
         """
         To run the experiment and get its results
@@ -120,7 +126,7 @@ class Experiment():
         for i in range(iterations):
             self.step()
             self.draw()
-        
+
         # Print the stations each train has been to
         for train in self.trains_list:
             print(train.list_of_stations)
