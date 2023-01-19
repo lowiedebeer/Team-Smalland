@@ -14,6 +14,7 @@ class Experiment():
         self.ridden_history = []
         self.minutes_left = 120
         self.train_route_list = []
+        self.total = 0
         self.connections = self.init_dicts()
         self.coordinates_dict = self.init_station_list()
         self.add_stations()
@@ -108,6 +109,7 @@ class Experiment():
             x_values = [self.coordinates_dict[train_route_map['station1'][i]][0], self.coordinates_dict[train_route_map['station2'][i]][0]]
             y_values = [self.coordinates_dict[train_route_map['station1'][i]][1], self.coordinates_dict[train_route_map['station2'][i]][1]]
 
+            # If yes, color red, if no color blue.
             if {train_route_map['station1'][i], train_route_map['station2'][i]} in self.train_route_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
                 fraction_used += 1
@@ -124,12 +126,19 @@ class Experiment():
         """
         To run the experiment and get its results
         """
+        station = set()
         # Loop over the iterations to set each step and draw each movement
         count = 0
         for i in range(iterations):
             self.step()
             self.traject_percentage, self.traject_counter = self.draw()
             count += 1
+            # print(count)
+
+        # Print the stations each train has been to
+        for train in self.trains_list:
+            station.update(set(train.list_of_stations))
+            self.total += train.total_min
 
     def setup_plot(self):
         # Making a subplot for the updating figure
