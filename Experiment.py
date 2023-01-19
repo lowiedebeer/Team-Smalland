@@ -104,7 +104,7 @@ class Experiment():
             self.train_route_list.append({train.current_station, train.destination[0]})
 
 
-        for i in range(len(traject_map['station1'])):
+        for i in range(len(train_route_map['station1'])):
             x_values = [self.coordinates_dict[train_route_map['station1'][i]][0], self.coordinates_dict[train_route_map['station2'][i]][0]]
             y_values = [self.coordinates_dict[train_route_map['station1'][i]][1], self.coordinates_dict[train_route_map['station2'][i]][1]]
 
