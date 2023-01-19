@@ -121,23 +121,19 @@ class Experiment():
         plt.draw()
         plt.pause(0.01)
         self.ax.cla()
-        return len(self.connect['station1']) / fraction_used, len(self.connect['station1'][i]][0])
+        return len(self.connect['station1']) / fraction_used, len(self.connect['station1'][i][0])
 
     def run(self, iterations):
         """
         To run the experiment and get its results
         """
         # Loop over the iterations to set each step and draw each movement
-        count = 0
         for i in range(iterations):
             self.step()
             self.traject_percentage, self.traject_counter = self.draw()
-            count += 1
-            # print(count)
 
         # Print the stations each train has been to
         for train in self.trains_list:
-            station.update(set(train.list_of_stations))
             self.total += train.total_min
 
         return 10000 * self.traject_percentage - (self.traject_counter * 100 + self.total)
