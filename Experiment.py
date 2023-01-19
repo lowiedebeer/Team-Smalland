@@ -14,6 +14,7 @@ class Experiment():
         self.ridden_history = []
         self.minutes_left = 120
         self.train_route_list = []
+        self.total = 0
         self.connections = self.init_dicts()
         self.coordinates_dict = self.init_station_list()
         self.add_stations()
@@ -136,7 +137,8 @@ class Experiment():
         # Print the stations each train has been to
         for train in self.trains_list:
             station.update(set(train.list_of_stations))
-            
+            self.total += train.total_min
+
     def setup_plot(self):
         # Making a subplot for the updating figure
         self.fig, self.ax = plt.subplots(figsize=(4,5))
