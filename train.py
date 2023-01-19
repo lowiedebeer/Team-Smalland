@@ -5,6 +5,7 @@ class Train():
     # Defining train_location, traject_length and destination
     def __init__(self, current_station, list_of_destinations):
         self.list_of_destinations = list_of_destinations
+        print(self.list_of_destinations)
         self.current_station = current_station # In minuten
         self.list_of_stations = [current_station]
         self.location = 0
@@ -30,7 +31,6 @@ class Train():
         new_destination = random.choice(list(destinations_per_train))
 
         return new_destination
-
 
     def movement(self):
         """
