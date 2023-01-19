@@ -15,7 +15,7 @@ class Experiment():
         self.minutes_left = 120
         self.train_route_list = []
         self.connections = self.init_dicts()
-        self.x_list, self.y_list, self.coordinates_dict = self.init_station_list()
+        self.coordinates_dict = self.init_station_list()
         self.add_stations()
         self.add_trains(number_of_trains)
         self.setup_plot()
@@ -73,7 +73,7 @@ class Experiment():
 
         # Loop over the coordinates and append to dictionary
         for i in range(len(self.station_map['x'])):
-            coordinates_dict[self.station_map['station'][i]] = [self.station_map['x'][i], self.station_map['y'][i]]
+            self.coordinates_dict[self.station_map['station'][i]] = [self.station_map['x'][i], self.station_map['y'][i]]
         return self.coordinates_dict
 
 
@@ -104,7 +104,7 @@ class Experiment():
             self.train_route_list.append({train.current_station, train.destination[0]})
 
 
-        for i in range(len(traject_map['station1'])):
+        for i in range(len(train_route_map['station1'])):
             x_values = [self.coordinates_dict[train_route_map['station1'][i]][0], self.coordinates_dict[train_route_map['station2'][i]][0]]
             y_values = [self.coordinates_dict[train_route_map['station1'][i]][1], self.coordinates_dict[train_route_map['station2'][i]][1]]
 
@@ -123,9 +123,12 @@ class Experiment():
         To run the experiment and get its results
         """
         # Loop over the iterations to set each step and draw each movement
+        count = 0
         for i in range(iterations):
             self.step()
             self.draw()
+            count += 1
+            # print(count)
 
         # Print the stations each train has been to
         for train in self.trains_list:
