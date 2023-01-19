@@ -16,28 +16,12 @@ class Experiment():
         # Read the csv-file with the geographical locations of the stations
         self.stations = pd.read_csv(stations)
         self.trains_list = []
-        self.stations_list = []
-        self.ridden_history = []
-        self.minutes_left = 120
         self.train_route_list = []
-        self.total = 0
         self.connections = self.init_dicts()
         self.coordinates_dict = self.init_station_list()
-        self.add_stations()
         self.add_trains(number_of_trains)
         self.setup_plot()
         self.traject_percentage, self.traject_counter = self.draw()
-
-
-    def add_stations(self):
-        """
-        Adding stations
-        """
-
-        # Looping over the length of the given dict of the stations
-        for i in range(len(self.coordinates_dict.keys())):
-            stations = Station(list(self.coordinates_dict.keys())[i])
-            self.stations_list.append(stations)
 
     def add_trains(self, number_of_trains):
         """
@@ -77,6 +61,7 @@ class Experiment():
         # Loop over the coordinates and append to dictionary
         for i in range(len(self.stations['x'])):
             self.coordinates_dict[self.stations['station'][i]] = [self.stations['x'][i], self.stations['y'][i]]
+        
         return self.coordinates_dict
 
 
@@ -127,6 +112,9 @@ class Experiment():
         """
         To run the experiment and get its results
         """
+
+        total = 0
+        
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
             self.step()
@@ -134,10 +122,9 @@ class Experiment():
 
         # Print the stations each train has been to
         for train in self.trains_list:
-            self.total += train.total_min
+            total += train.total_min
 
-        print(self.traject_percentage, self.traject_counter, self.total)
-        return 10000 * self.traject_percentage - (self.traject_counter * 100 + self.total)
+        return 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
 
 
     def setup_plot(self):
@@ -145,8 +132,8 @@ class Experiment():
         self.fig, self.ax = plt.subplots(figsize=(4,5))
 
 scores = []
-for i in range(100):
+for i in range(1):
     my_experiment = Experiment(7,'ConnectiesHolland.csv', 'StationsHollandPositie.csv')
-    scores.append(my_experiment.run(180))
+    scores.append(my_experiment.run(120))
     print(sum(scores) / len(scores))
     print(max(scores))
