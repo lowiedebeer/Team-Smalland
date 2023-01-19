@@ -103,11 +103,13 @@ class Experiment():
         for train in self.trains_list:
             self.train_route_list.append({train.current_station, train.destination[0]})
 
-
+        # Loop over the connection between stations and check wether a connection
+        # is already in the list of train routes. If yes, color red, if no color blue.
         for i in range(len(train_route_map['station1'])):
             x_values = [self.coordinates_dict[train_route_map['station1'][i]][0], self.coordinates_dict[train_route_map['station2'][i]][0]]
             y_values = [self.coordinates_dict[train_route_map['station1'][i]][1], self.coordinates_dict[train_route_map['station2'][i]][1]]
 
+            # If yes, color red, if no color blue.
             if {train_route_map['station1'][i], train_route_map['station2'][i]} in self.train_route_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
             else:
