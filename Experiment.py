@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import random
 
-from train import Train
+from class_train import Train
 from class_station import Station
 
 class Experiment():
@@ -124,7 +124,6 @@ class Experiment():
         """
         To run the experiment and get its results
         """
-        station = set()
         # Loop over the iterations to set each step and draw each movement
         count = 0
         for i in range(iterations):
@@ -135,8 +134,8 @@ class Experiment():
 
         # Print the stations each train has been to
         for train in self.trains_list:
-            station.update(set(train.list_of_stations))
-            
+            print(train.list_of_stations)
+
     def setup_plot(self):
         # Making a subplot for the updating figure
         self.fig, self.ax = plt.subplots(figsize=(4,5))
