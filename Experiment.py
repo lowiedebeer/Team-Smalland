@@ -121,7 +121,7 @@ class Experiment():
         plt.draw()
         plt.pause(0.01)
         self.ax.cla()
-        return len(self.connect['station1']) / fraction_used, len(self.train_route_list)
+        return len(self.connect['station1']) / fraction_used, len(self.connect['station1'][i]][0])
 
     def run(self, iterations):
         """
