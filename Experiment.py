@@ -102,7 +102,7 @@ class Experiment():
         for train in self.trains_list:
             self.train_route_list.append({train.current_station, train.destination[0]})
 
-        fraction_used = 0
+        amount_used = 0
 
         # Loop over the connection between stations and check wether a connection
         # is already in the list of train routes. If yes, color red, if no color blue.
@@ -113,7 +113,7 @@ class Experiment():
             # If yes, color red, if no color blue.
             if {self.connect['station1'][i], self.connect['station2'][i]} in self.train_route_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
-                fraction_used += 1
+                amount_used += 1
             else:
                 self.ax.plot(x_values, y_values, 'bo', linestyle="--")
 
@@ -121,7 +121,7 @@ class Experiment():
         plt.draw()
         plt.pause(0.01)
         self.ax.cla()
-        return len(self.connect['station1']) / fraction_used, len(self.connect['station1'][i][0])
+        return amount_used / len(self.connect['station1']), len(self.connect['station1'])
 
     def run(self, iterations):
         """
@@ -136,6 +136,7 @@ class Experiment():
         for train in self.trains_list:
             self.total += train.total_min
 
+        print(self.traject_percentage, self.traject_counter, self.total)
         return 10000 * self.traject_percentage - (self.traject_counter * 100 + self.total)
 
 
@@ -144,7 +145,8 @@ class Experiment():
         self.fig, self.ax = plt.subplots(figsize=(4,5))
 
 scores = []
-for i in  range(3):
-    my_experiment = Experiment(22,'ConnectiesNationaal.csv', 'StationsNationaal.csv')
+for i in range(100):
+    my_experiment = Experiment(7,'ConnectiesHolland.csv', 'StationsHollandPositie.csv')
     scores.append(my_experiment.run(180))
-print(scores)
+    print(sum(scores) / len(scores))
+    print(max(scores))
