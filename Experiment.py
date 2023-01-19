@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import random
 
-from train import Train
+from class_train import Train
 from class_station import Station
 
 class Experiment():
@@ -127,7 +127,6 @@ class Experiment():
         """
         To run the experiment and get its results
         """
-        station = set()
         # Loop over the iterations to set each step and draw each movement
         count = 0
         for i in range(iterations):
