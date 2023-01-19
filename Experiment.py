@@ -8,7 +8,13 @@ from class_station import Station
 class Experiment():
 
     #initialize trains and stations
-    def __init__(self, number_of_trains):
+    def __init__(self, number_of_trains, connections, stations):
+        # Read the csv-file of the connections between stations into
+        # a dataframe for each csv-file.
+        self.connect = pd.read_csv(connections)
+
+        # Read the csv-file with the geographical locations of the stations
+        self.stations = pd.read_csv(stations)
         self.trains_list = []
         self.stations_list = []
         self.ridden_history = []
@@ -46,19 +52,18 @@ class Experiment():
 
 
     def init_dicts(self):
-        connections = pd.read_csv('ConnectiesHolland.csv')
         dict_of_connections = {}
 
         # Loop over the dataframe to append all stations as dictionaries to list
-        for i in range(len(connections['station1'])):
-            if connections["station1"][i] in dict_of_connections.keys():
-                dict_of_connections[connections["station1"][i]][connections["station2"][i]] = connections["distance"][i]
+        for i in range(len(self.connect['station1'])):
+            if self.connect["station1"][i] in dict_of_connections.keys():
+                dict_of_connections[self.connect["station1"][i]][self.connect["station2"][i]] = self.connect["distance"][i]
             else:
-                dict_of_connections[connections["station1"][i]] = {connections["station2"][i] : connections["distance"][i]}
-            if connections["station2"][i] in dict_of_connections.keys():
-                dict_of_connections[connections["station2"][i]][connections["station1"][i]] = connections["distance"][i]
+                dict_of_connections[self.connect["station1"][i]] = {self.connect["station2"][i] : self.connect["distance"][i]}
+            if self.connect["station2"][i] in dict_of_connections.keys():
+                dict_of_connections[self.connect["station2"][i]][self.connect["station1"][i]] = self.connect["distance"][i]
             else:
-                dict_of_connections[connections["station2"][i]] = {connections["station1"][i] : connections["distance"][i]}
+                dict_of_connections[self.connect["station2"][i]] = {self.connect["station1"][i] : self.connect["distance"][i]}
 
         return dict_of_connections
 
@@ -67,14 +72,11 @@ class Experiment():
         Create a dictionary of the stations with their coordinates as values
         """
 
-        # Read the csv-file with the geographical locations of the stations
-        self.station_map = pd.read_csv('StationsHollandPositie.csv')
-
         self.coordinates_dict = {}
 
         # Loop over the coordinates and append to dictionary
-        for i in range(len(self.station_map['x'])):
-            self.coordinates_dict[self.station_map['station'][i]] = [self.station_map['x'][i], self.station_map['y'][i]]
+        for i in range(len(self.stations['x'])):
+            self.coordinates_dict[self.stations['station'][i]] = [self.stations['x'][i], self.stations['y'][i]]
         return self.coordinates_dict
 
 
@@ -91,26 +93,23 @@ class Experiment():
         Plot the stations and trajectories of trains between stations.
         """
 
-        # Read the csv-file of the connections between stations into
-        # a dataframe for each csv-file.
-        train_route_map = pd.read_csv('ConnectiesHolland.csv')
-
         # Making a list of x and y values of the positions of the stations
         # to later be able to plot the stations.
-        x_list = list(self.station_map['x'])
-        y_list = list(self.station_map['y'])
+        x_list = list(self.stations['x'])
+        y_list = list(self.stations['y'])
 
         # Keep track of the stations a train has passed on its route
         for train in self.trains_list:
             self.train_route_list.append({train.current_station, train.destination[0]})
 
-        fraction_used = 0
-        for i in range(len(train_route_map['station1'])):
-            x_values = [self.coordinates_dict[train_route_map['station1'][i]][0], self.coordinates_dict[train_route_map['station2'][i]][0]]
-            y_values = [self.coordinates_dict[train_route_map['station1'][i]][1], self.coordinates_dict[train_route_map['station2'][i]][1]]
+        # Loop over the connection between stations and check wether a connection
+        # is already in the list of train routes. If yes, color red, if no color blue.
+        for i in range(len(self.connect['station1'])):
+            x_values = [self.coordinates_dict[self.connect['station1'][i]][0], self.coordinates_dict[self.connect['station2'][i]][0]]
+            y_values = [self.coordinates_dict[self.connect['station1'][i]][1], self.coordinates_dict[self.connect['station2'][i]][1]]
 
             # If yes, color red, if no color blue.
-            if {train_route_map['station1'][i], train_route_map['station2'][i]} in self.train_route_list:
+            if {self.connect['station1'][i], self.connect['station2'][i]} in self.train_route_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
                 fraction_used += 1
             else:
@@ -145,6 +144,5 @@ class Experiment():
         self.fig, self.ax = plt.subplots(figsize=(4,5))
 
 
-my_experiment = Experiment(7)
-for i in range
+my_experiment = Experiment(7,'ConnectiesNationaal.csv', 'StationsNationaal.csv')
 my_experiment.run(120)
