@@ -10,7 +10,7 @@ class Train():
         self.location = 0
         self.list_of_destinations = list_of_destinations
         self.destination = self.destinations()
-
+        self.total_min = 0
 
 
     def destinations(self):
@@ -48,6 +48,7 @@ class Train():
             self.destination = self.destinations()
 
             # Resetting the counter for the location
+            self.total_min += self.location
             self.location = 0
 
         return self.list_of_stations
