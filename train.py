@@ -24,10 +24,10 @@ class Train():
         
         # Randomly choosing a new destination
         new_destination = random.choice(list(destinations_per_train.items()))
-        print(new_destination)
-        if self.current_station != "Dordrecht" and self.current_station != "Den Helder":
-            while new_destination[0] == self.previous:
-                new_destination = random.choice(list(destinations_per_train.items()))
+
+        # if self.current_station != "Dordrecht" and self.current_station != "Den Helder":
+        #     while new_destination[0] == self.previous:
+        #         new_destination = random.choice(list(destinations_per_train.items()))
         
         return new_destination
     

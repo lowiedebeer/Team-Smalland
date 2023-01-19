@@ -122,6 +122,7 @@ class Experiment():
         """
         To run the experiment and get its results
         """
+        station = set()
         # Loop over the iterations to set each step and draw each movement
         count = 0
         for i in range(iterations):
@@ -132,8 +133,8 @@ class Experiment():
 
         # Print the stations each train has been to
         for train in self.trains_list:
-            print(train.list_of_stations)
-
+            station.update(set(train.list_of_stations))
+            
     def setup_plot(self):
         # Making a subplot for the updating figure
         self.fig, self.ax = plt.subplots(figsize=(4,5))
