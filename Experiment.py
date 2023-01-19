@@ -19,10 +19,10 @@ class Experiment():
         self.add_stations()
         self.add_trains(number_of_trains)
         self.setup_plot()
-        self.draw()
+        self.traject_percentage, self.traject_counter = self.draw()
 
 
-    def add_stations(self, ):
+    def add_stations(self):
         """
         Adding stations
         """
@@ -103,13 +103,14 @@ class Experiment():
         for train in self.trains_list:
             self.train_route_list.append({train.current_station, train.destination[0]})
 
-
+        fraction_used = 0
         for i in range(len(train_route_map['station1'])):
             x_values = [self.coordinates_dict[train_route_map['station1'][i]][0], self.coordinates_dict[train_route_map['station2'][i]][0]]
             y_values = [self.coordinates_dict[train_route_map['station1'][i]][1], self.coordinates_dict[train_route_map['station2'][i]][1]]
 
             if {train_route_map['station1'][i], train_route_map['station2'][i]} in self.train_route_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
+                fraction_used += 1
             else:
                 self.ax.plot(x_values, y_values, 'bo', linestyle="--")
 
@@ -117,6 +118,7 @@ class Experiment():
         plt.draw()
         plt.pause(0.01)
         self.ax.cla()
+        return len(train_route_map['station1']) / fraction_used, len(self.train_route_list)
 
     def run(self, iterations):
         """
@@ -126,13 +128,8 @@ class Experiment():
         count = 0
         for i in range(iterations):
             self.step()
-            self.draw()
+            self.traject_percentage, self.traject_counter = self.draw()
             count += 1
-            # print(count)
-
-        # Print the stations each train has been to
-        for train in self.trains_list:
-            print(train.list_of_stations)
 
     def setup_plot(self):
         # Making a subplot for the updating figure
@@ -140,4 +137,5 @@ class Experiment():
 
 
 my_experiment = Experiment(7)
+for i in range
 my_experiment.run(120)
