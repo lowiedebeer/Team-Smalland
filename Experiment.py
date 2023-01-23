@@ -142,5 +142,5 @@ print(scores)
 # plotting labelled histogram
 plt.hist(scores)
 plt.xlabel('Score')
-plt.ylabel('Iterations')
+plt.ylabel('Number of solutions')
 plt.show()
