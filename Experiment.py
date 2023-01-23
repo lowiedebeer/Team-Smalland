@@ -61,7 +61,7 @@ class Experiment():
         # Loop over the coordinates and append to dictionary
         for i in range(len(self.stations['x'])):
             self.coordinates_dict[self.stations['station'][i]] = [self.stations['x'][i], self.stations['y'][i]]
-        
+
         return self.coordinates_dict
 
 
@@ -114,7 +114,7 @@ class Experiment():
         """
 
         total = 0
-        
+
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
             self.step()
@@ -132,8 +132,15 @@ class Experiment():
         self.fig, self.ax = plt.subplots(figsize=(4,5))
 
 scores = []
-for i in range(1):
+for i in range(3):
     my_experiment = Experiment(7,'ConnectiesHolland.csv', 'StationsHollandPositie.csv')
     scores.append(my_experiment.run(120))
     print(sum(scores) / len(scores))
     print(max(scores))
+print(scores)
+
+# plotting labelled histogram
+plt.hist(scores)
+plt.xlabel('Score')
+plt.ylabel('Iterations')
+plt.show()
