@@ -24,15 +24,17 @@ class Experiment():
         self.traject_percentage, self.traject_counter = self.draw()
 
     def add_trains(self, number_of_trains):
-        """
-        Adding trains from the imported train class
-        """
+            """
+            Adding trains from the imported train class
+            """
+            stations = self.coordinates_dict.copy()
 
-        # Making trains for the given amount of total trains
-        for i in range(number_of_trains):
-            current_station = random.sample(self.coordinates_dict.keys(), 1)
-            train = Train(str(current_station[0]), self.connections)
-            self.trains_list.append(train)
+            # Making trains for the given amount of total trains
+            for i in range(number_of_trains):
+                current_station = random.sample(stations.keys(), 1)
+                train = Train(str(current_station[0]), self.connections)
+                self.trains_list.append(train)
+                stations.pop(current_station[0])
 
 
     def init_dicts(self):
