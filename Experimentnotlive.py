@@ -19,8 +19,9 @@ class Experiment():
         self.train_route_list = []
         self.connections = self.init_dicts()
         self.coordinates_dict = self.init_station_list()
+        self.traject_counter = number_of_trains
         self.add_trains(number_of_trains)
-        self.traject_percentage, self.traject_counter = self.draw()
+        self.traject_percentage = self.draw()
 
     def add_trains(self, number_of_trains):
             """
@@ -93,7 +94,7 @@ class Experiment():
             if {self.connect['station1'][i], self.connect['station2'][i]} in self.train_route_list:
                 amount_used += 1
 
-        return amount_used / len(self.connect['station1']), len(self.connect['station1'])
+        return amount_used / len(self.connect['station1'])
 
     def run(self, iterations):
         """
@@ -105,7 +106,7 @@ class Experiment():
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
             self.step()
-            self.traject_percentage, self.traject_counter = self.draw()
+            self.traject_percentage = self.draw()
 
         # Print the stations each train has been to
         for train in self.trains_list:
@@ -116,7 +117,7 @@ class Experiment():
 
 
 scores = []
-for i in range(100):
+for i in range(1000):
     my_experiment = Experiment(7,'ConnectiesHolland.csv', 'StationsHollandPositie.csv')
     scores.append(my_experiment.run(120))
 
