@@ -18,12 +18,20 @@ class Train():
         Randomly choosing a new destination for a train based on its current location and
         its possible destinations
         """
+        counter = 0
 
         # Loop through all the options and save the possible destinations
         destinations_per_train = self.list_of_destinations[self.current_station]
 
         # Randomly choosing a new destination
         new_destination = random.choice(list(destinations_per_train.items()))
+
+        while new_destination[0] in self.list_of_stations:
+            counter += 1
+            new_destination = random.choice(list(destinations_per_train.items()))
+            
+            if len(list(destinations_per_train.items())) == counter:
+                return new_destination
 
         # if len(destinations_per_train) > 1:
         #     while new_destination[0] == self.previous:
