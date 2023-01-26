@@ -155,7 +155,8 @@ class Experiment():
             total += train.total_min
 
         objective_funtion = 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
-
+        if self.traject_percentage == 1:
+            exit()
         return objective_funtion
 
 
