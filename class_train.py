@@ -6,7 +6,7 @@ class Train():
     def __init__(self, current_station, list_of_destinations):
         self.current_station = current_station
         self.previous = 0
-        self.list_of_stations = [current_station]
+        self.list_of_stations = []
         self.location = 0
         self.list_of_destinations = list_of_destinations
         self.destination = self.destinations()
@@ -26,16 +26,12 @@ class Train():
         # Randomly choosing a new destination
         new_destination = random.choice(list(destinations_per_train.items()))
 
-        while new_destination[0] in self.list_of_stations:
+        while {self.current_station, new_destination[0]} in self.list_of_stations:
             counter += 1
             new_destination = random.choice(list(destinations_per_train.items()))
             
             if len(list(destinations_per_train.items())) == counter:
                 return new_destination
-
-        # if len(destinations_per_train) > 1:
-        #     while new_destination[0] == self.previous:
-        #         new_destination = random.choice(list(destinations_per_train.items()))
 
         return new_destination
 
@@ -49,14 +45,12 @@ class Train():
         # If the distance between the train and the station is 0 add it to the list of stations
         if self.destination[1] - self.location == 0:
             self.previous = self.current_station
+            self.list_of_stations.append({self.current_station, self.destination[0]})
             self.current_station = self.destination[0]
-            self.list_of_stations.append(self.current_station)
-
             # Determining the next destination
             self.destination = self.destinations()
 
             # Resetting the counter for the location
             self.total_min += self.location
             self.location = 0
-
         return self.list_of_stations
