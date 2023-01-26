@@ -129,6 +129,53 @@ class Experiment():
 
         return 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
 
+    def hill_climber(self, max_iterations):
+        # Initialize the current state of the simulation
+        current_state = self.get_state()
+        current_score = self.evaluate_objective_function(current_state)
+
+        for i in range(max_iterations):
+            # Make small changes to the current state
+            new_state = self.perturb_state(current_state)
+
+            # Evaluate the objective function for the new state
+            new_score = self.evaluate_objective_function(new_state)
+
+            # If the new state is better than the current state, move to the new state
+            if new_score > current_score:
+                current_state = new_state
+                current_score = new_score
+                print("New best state found with score:", current_score)
+            else:
+                # Otherwise, with some probability, move to the new state anyway
+                prob = np.exp((new_score - current_score) / self.temperature)
+                if np.random.rand() < prob:
+                    current_state = new_state
+                    current_score = new_score
+                    print("New state found with score:", current_score)
+
+        return current_state
+
+    def get_state(self):
+        """
+        Returns the current state of the simulation, e.g. the positions and velocities of all trains
+        """
+        return self.train_route_list
+
+    def perturb_state(self, state):
+        """
+        Makes small changes to the state of the simulation
+        """
+
+        
+
+    def check_objective_function(self, state):
+        """
+        Returns the value of the objective function for the given state
+        """
+
+        return self.run()
+
 
     def setup_plot(self):
         # Making a subplot for the updating figure
