@@ -27,14 +27,20 @@ class Experiment():
             """
             Adding trains from the imported train class
             """
-            stations = self.coordinates_dict.copy()
+            stations = self.connections.copy()
+            odd_connections_dic = {}
+            # Making trains for the given amount of total trains
+            
+            for key, value in stations.items():
+                if len(value) % 2 == 1:
+                    odd_connections_dic[key] = value
 
             # Making trains for the given amount of total trains
             for i in range(number_of_trains):
-                current_station = random.sample(stations.keys(), 1)
+                current_station = random.sample(odd_connections_dic.keys(), 1)
                 train = Train(str(current_station[0]), self.connections)
                 self.trains_list.append(train)
-                stations.pop(current_station[0])
+                odd_connections_dic.pop(current_station[0])
 
 
     def init_dicts(self):
@@ -117,7 +123,7 @@ class Experiment():
 
 
 scores = []
-for i in range(1000):
+for i in range(100):
     my_experiment = Experiment(7,'ConnectiesHolland.csv', 'StationsHollandPositie.csv')
     scores.append(my_experiment.run(120))
 
