@@ -23,7 +23,6 @@ class Experiment():
         self.coordinates_dict = self.init_station_list()
         self.add_trains(number_of_trains)
         self.setup_plot()
-        self.traject_percentage = self.draw()
         self.traject_counter = number_of_trains
 
     def add_trains(self, number_of_trains):
@@ -97,9 +96,12 @@ class Experiment():
         """
         Calling for every train in the list of trains for its movement
         """
+        train_list = []
         for train in self.trains_list:
             train.movement()
-
+            train_list.append(train.list_of_stations)
+        
+        return train_list
 
     def draw(self):
         """
@@ -110,26 +112,26 @@ class Experiment():
         # to later be able to plot the stations.
         x_list = list(self.stations['x'])
         y_list = list(self.stations['y'])
+        amount_used = 0
+        total_list = []
 
         # Keep track of the stations a train has passed on its route
-        for train in self.trains_list:
-            self.train_route_list.append({train.current_station, train.destination[0]})
-
-        amount_used = 0
+        for train_list in self.list_of_stations:
+            for destination in train_list:
+                total_list.append(destination)
 
         # Loop over the connection between stations and check wether a connection
         # is already in the list of train routes. If yes, color red, if no color blue.
         for i in range(len(self.connect['station1'])):
             x_values = [self.coordinates_dict[self.connect['station1'][i]][0], self.coordinates_dict[self.connect['station2'][i]][0]]
             y_values = [self.coordinates_dict[self.connect['station1'][i]][1], self.coordinates_dict[self.connect['station2'][i]][1]]
-
-            # If yes, color red, if no color blue.
-            if {self.connect['station1'][i], self.connect['station2'][i]} in self.train_route_list:
+            
+            if {self.connect['station1'][i], self.connect['station2'][i]} in total_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
                 amount_used += 1
             else:
                 self.ax.plot(x_values, y_values, 'bo', linestyle="--")
-
+        
         plt.plot(x_list, y_list, 'go')
         plt.draw()
         plt.pause(0.01)
@@ -144,13 +146,14 @@ class Experiment():
         total = 0
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
-            self.step()
+            self.list_of_stations = self.step()
 
-
+        self.traject_percentage = self.draw()
 
         # Print the stations each train has been to
         for train in self.trains_list:
             total += train.total_min
+            train.total_min = 0 
 
         return 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
 
@@ -191,13 +194,18 @@ class Experiment():
         """
         Makes small changes to the state of the simulation
         """
+        train = random.randrange(len(self.trains_list))
+        del self.list_of_stations[train]
+        self.trains_list[train].list_of_stations = []
+
+        
 
     def check_objective_function(self, state):
         """
         Returns the value of the objective function for the given state
         """
 
-        return self.run()
+        return self.run(120)
 
 
     def setup_plot(self):
@@ -205,9 +213,9 @@ class Experiment():
         self.fig, self.ax = plt.subplots(figsize=(4,5))
 
 scores = []
-for i in range(3):
+for i in range(1):
     my_experiment = Experiment(7,'ConnectiesHolland.csv', 'StationsHollandPositie.csv')
-    scores.append(my_experiment.run(120))
+    scores.append(my_experiment.hill_climber(120))
     print(sum(scores) / len(scores))
     print(max(scores))
 print(scores)
