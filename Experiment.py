@@ -22,7 +22,7 @@ class Experiment():
         self.add_trains(number_of_trains)
         self.setup_plot()
         self.traject_percentage = self.draw()
-        self.traject_counter = number_of_trains 
+        self.traject_counter = number_of_trains
 
     def add_trains(self, number_of_trains):
             """
@@ -36,7 +36,7 @@ class Experiment():
             outlying_stations = {}
             counter = 0
 
-            #             
+            #
             for key, value in stations.items():
                 if len(value) == 1:
                     outlying_stations[key] = value
@@ -48,19 +48,19 @@ class Experiment():
             # Making trains for the given amount of total trains
             while outlying_stations or odd_connections_dic:
                 counter += 1
-                
+
                 if outlying_stations:
                     current_station = random.sample(outlying_stations.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     outlying_stations.pop(current_station[0])
-                
+
                 elif odd_connections_dic:
                     current_station = random.sample(odd_connections_dic.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     odd_connections_dic.pop(current_station[0])
-                    
+
                     if counter == number_of_trains:
                         return
 
@@ -144,16 +144,20 @@ class Experiment():
 
         total = 0
 
-        # Loop over the iterations to set each step and draw each movement
-        for i in range(iterations):
-            self.step()
-            self.traject_percentage = self.draw()
+        while self.traject_percentage < 1:
+            # Loop over the iterations to set each step and draw each movement
+            for i in range(iterations):
+                self.step()
+                self.traject_percentage = self.draw()
 
-        # Print the stations each train has been to
-        for train in self.trains_list:
-            total += train.total_min
+            # Print the stations each train has been to
+            for train in self.trains_list:
+                total += train.total_min
+            if self.traject_percentage == 1:
+                print('p = 1')
+            objective_funtion = 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
 
-        return 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
+        return objective_funtion
 
 
     def setup_plot(self):
