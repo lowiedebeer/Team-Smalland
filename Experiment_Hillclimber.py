@@ -2,6 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 from class_train import Train
 from class_station import Station
@@ -34,7 +35,7 @@ class Experiment():
             outlying_stations = {}
             counter = 0
 
-            #             
+            #
             for key, value in stations.items():
                 if len(value) == 1:
                     outlying_stations[key] = value
@@ -46,19 +47,19 @@ class Experiment():
             # Making trains for the given amount of total trains
             while outlying_stations or odd_connections_dic:
                 counter += 1
-                
+
                 if outlying_stations:
                     current_station = random.sample(outlying_stations.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     outlying_stations.pop(current_station[0])
-                
+
                 elif odd_connections_dic:
                     current_station = random.sample(odd_connections_dic.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     odd_connections_dic.pop(current_station[0])
-                    
+
                     if counter == number_of_trains:
                         return
 
@@ -141,11 +142,11 @@ class Experiment():
         """
 
         total = 0
-
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
             self.step()
-            self.traject_percentage = self.draw()
+
+
 
         # Print the stations each train has been to
         for train in self.trains_list:
@@ -156,14 +157,14 @@ class Experiment():
     def hill_climber(self, max_iterations):
         # Initialize the current state of the simulation
         current_state = self.get_state()
-        current_score = self.evaluate_objective_function(current_state)
+        current_score = self.check_objective_function(current_state)
 
         for i in range(max_iterations):
             # Make small changes to the current state
-            new_state = self.perturb_state(current_state)
+            new_state = self.change_route(current_state)
 
             # Evaluate the objective function for the new state
-            new_score = self.evaluate_objective_function(new_state)
+            new_score = self.check_objective_function(new_state)
 
             # If the new state is better than the current state, move to the new state
             if new_score > current_score:
@@ -186,12 +187,10 @@ class Experiment():
         """
         return self.train_route_list
 
-    def perturb_state(self, state):
+    def change_route(self, state):
         """
         Makes small changes to the state of the simulation
         """
-
-        
 
     def check_objective_function(self, state):
         """
