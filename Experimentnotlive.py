@@ -29,18 +29,36 @@ class Experiment():
             """
             stations = self.connections.copy()
             odd_connections_dic = {}
-            # Making trains for the given amount of total trains
-            
+            outlying_stations = {}
+            counter = 0
+
+            #             
             for key, value in stations.items():
-                if len(value) % 2 == 1:
+                if len(value) == 1:
+                    outlying_stations[key] = value
+
+                if len(value) % 2 == 1 and len(value) != 1:
                     odd_connections_dic[key] = value
 
+
             # Making trains for the given amount of total trains
-            for i in range(number_of_trains):
-                current_station = random.sample(odd_connections_dic.keys(), 1)
-                train = Train(str(current_station[0]), self.connections)
-                self.trains_list.append(train)
-                odd_connections_dic.pop(current_station[0])
+            while outlying_stations or odd_connections_dic:
+                counter += 1
+                
+                if outlying_stations:
+                    current_station = random.sample(outlying_stations.keys(), 1)
+                    train = Train(str(current_station[0]), self.connections)
+                    self.trains_list.append(train)
+                    outlying_stations.pop(current_station[0])
+                
+                elif odd_connections_dic:
+                    current_station = random.sample(odd_connections_dic.keys(), 1)
+                    train = Train(str(current_station[0]), self.connections)
+                    self.trains_list.append(train)
+                    odd_connections_dic.pop(current_station[0])
+                    
+                    if counter == number_of_trains:
+                        return
 
 
     def init_dicts(self):

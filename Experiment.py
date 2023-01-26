@@ -21,21 +21,48 @@ class Experiment():
         self.coordinates_dict = self.init_station_list()
         self.add_trains(number_of_trains)
         self.setup_plot()
-        self.traject_percentage, self.traject_counter = self.draw()
+        self.traject_percentage = self.draw()
+        self.traject_counter = number_of_trains 
 
     def add_trains(self, number_of_trains):
             """
             Adding trains from the imported train class
             """
+            counter = 0
             stations = self.coordinates_dict.copy()
+            # Making trains for the given amount of total trains
+            stations = self.connections.copy()
+            odd_connections_dic = {}
+            outlying_stations = {}
+            counter = 0
+
+            #             
+            for key, value in stations.items():
+                if len(value) == 1:
+                    outlying_stations[key] = value
+
+                if len(value) % 2 == 1 and len(value) != 1:
+                    odd_connections_dic[key] = value
+
 
             # Making trains for the given amount of total trains
-            for i in range(number_of_trains):
-                current_station = random.sample(stations.keys(), 1)
-                train = Train(str(current_station[0]), self.connections)
-                self.trains_list.append(train)
-                stations.pop(current_station[0])
-
+            while outlying_stations or odd_connections_dic:
+                counter += 1
+                
+                if outlying_stations:
+                    current_station = random.sample(outlying_stations.keys(), 1)
+                    train = Train(str(current_station[0]), self.connections)
+                    self.trains_list.append(train)
+                    outlying_stations.pop(current_station[0])
+                
+                elif odd_connections_dic:
+                    current_station = random.sample(odd_connections_dic.keys(), 1)
+                    train = Train(str(current_station[0]), self.connections)
+                    self.trains_list.append(train)
+                    odd_connections_dic.pop(current_station[0])
+                    
+                    if counter == number_of_trains:
+                        return
 
     def init_dicts(self):
         dict_of_connections = {}
@@ -108,7 +135,7 @@ class Experiment():
         plt.draw()
         plt.pause(0.01)
         self.ax.cla()
-        return amount_used / len(self.connect['station1']), len(self.connect['station1'])
+        return amount_used / len(self.connect['station1'])
 
     def run(self, iterations):
         """
@@ -120,7 +147,7 @@ class Experiment():
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
             self.step()
-            self.traject_percentage, self.traject_counter = self.draw()
+            self.traject_percentage = self.draw()
 
         # Print the stations each train has been to
         for train in self.trains_list:
