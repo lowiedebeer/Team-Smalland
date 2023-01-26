@@ -132,14 +132,14 @@ class Experiment():
     def hill_climber(self, max_iterations):
         # Initialize the current state of the simulation
         current_state = self.get_state()
-        current_score = self.evaluate_objective_function(current_state)
+        current_score = self.check_objective_function(current_state)
 
         for i in range(max_iterations):
             # Make small changes to the current state
-            new_state = self.perturb_state(current_state)
+            new_state = self.change_route(current_state)
 
             # Evaluate the objective function for the new state
-            new_score = self.evaluate_objective_function(new_state)
+            new_score = self.check_objective_function(new_state)
 
             # If the new state is better than the current state, move to the new state
             if new_score > current_score:
@@ -162,12 +162,10 @@ class Experiment():
         """
         return self.train_route_list
 
-    def perturb_state(self, state):
+    def change_route(self, state):
         """
         Makes small changes to the state of the simulation
         """
-
-        
 
     def check_objective_function(self, state):
         """
