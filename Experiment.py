@@ -144,18 +144,17 @@ class Experiment():
 
         total = 0
 
-        while self.traject_percentage < 1:
-            # Loop over the iterations to set each step and draw each movement
-            for i in range(iterations):
-                self.step()
-                self.traject_percentage = self.draw()
 
-            # Print the stations each train has been to
-            for train in self.trains_list:
-                total += train.total_min
-            if self.traject_percentage == 1:
-                print('p = 1')
-            objective_funtion = 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
+        # Loop over the iterations to set each step and draw each movement
+        for i in range(iterations):
+            self.step()
+            self.traject_percentage = self.draw()
+
+        # Print the stations each train has been to
+        for train in self.trains_list:
+            total += train.total_min
+
+        objective_funtion = 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
 
         return objective_funtion
 

@@ -2,6 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 from class_train import Train
 from class_station import Station
@@ -34,7 +35,7 @@ class Experiment():
             outlying_stations = {}
             counter = 0
 
-            #             
+            #
             for key, value in stations.items():
                 if len(value) == 1:
                     outlying_stations[key] = value
@@ -46,19 +47,19 @@ class Experiment():
             # Making trains for the given amount of total trains
             while outlying_stations or odd_connections_dic:
                 counter += 1
-                
+
                 if outlying_stations:
                     current_station = random.sample(outlying_stations.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     outlying_stations.pop(current_station[0])
-                
+
                 elif odd_connections_dic:
                     current_station = random.sample(odd_connections_dic.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     odd_connections_dic.pop(current_station[0])
-                    
+
                     if counter == number_of_trains:
                         return
 
@@ -141,11 +142,11 @@ class Experiment():
         """
 
         total = 0
-
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
             self.step()
-            self.traject_percentage = self.draw()
+
+
 
         # Print the stations each train has been to
         for train in self.trains_list:
