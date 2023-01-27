@@ -19,12 +19,15 @@ class Experiment():
         self.stations = pd.read_csv(stations)
         self.trains_list = []
         self.train_route_list = []
+        self.list_of_stations = []
+        self.total = 0
         self.connections = self.init_dicts()
         self.coordinates_dict = self.init_station_list()
         self.add_trains(number_of_trains)
         self.setup_plot()
         self.traject_counter = number_of_trains
-
+        self.temperature = 100
+    
     def add_trains(self, number_of_trains):
             """
             Adding trains from the imported train class
@@ -34,31 +37,39 @@ class Experiment():
             outlying_stations = {}
             counter = 0
 
-            #
+            # Making a dictionary for the stations with one connection
             for key, value in stations.items():
                 if len(value) == 1:
                     outlying_stations[key] = value
 
+                # Making dictionaries of the odd stations
                 if len(value) % 2 == 1 and len(value) != 1:
                     odd_connections_dic[key] = value
 
 
-            # Making trains for the given amount of total trains
+            # Using the made dictionaries to assign the stations
             while outlying_stations or odd_connections_dic:
                 counter += 1
 
+                # First use the stations with just one connection and make train objects starting here
                 if outlying_stations:
                     current_station = random.sample(outlying_stations.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     outlying_stations.pop(current_station[0])
+                    
+                    # If the max trains are reached stop
+                    if counter == number_of_trains:
+                        return
 
+                # If there are no stations with one connection left use the other dictionary
                 elif odd_connections_dic:
                     current_station = random.sample(odd_connections_dic.keys(), 1)
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     odd_connections_dic.pop(current_station[0])
 
+                    # If the max trains are reached stop
                     if counter == number_of_trains:
                         return
 
@@ -97,6 +108,9 @@ class Experiment():
         Calling for every train in the list of trains for its movement
         """
         train_list = []
+
+        # Loop over all the trains and use there movement definition
+        # Add all the trajects that they have ridden on to a list
         for train in self.trains_list:
             train.movement()
             train_list.append(train.list_of_stations)
@@ -144,18 +158,27 @@ class Experiment():
         """
 
         total = 0
+        
         # Loop over the iterations to set each step and draw each movement
         for i in range(iterations):
-            self.list_of_stations = self.step()
-
+            stations = self.step()
+        
+        # Add all the stations to a self object
+        for station_train in stations:
+            self.list_of_stations.append(station_train)
+        
+        # Calculate the traject_percentage
         self.traject_percentage = self.draw()
 
         # Print the stations each train has been to
         for train in self.trains_list:
             total += train.total_min
-            train.total_min = 0 
+        
+        # Making the total a self object
+        self.total += total
 
-        return 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
+        return 10000 * self.traject_percentage - (self.traject_counter * 100 + self.total)
+
 
     def hill_climber(self, max_iterations):
         # Initialize the current state of the simulation
@@ -174,13 +197,13 @@ class Experiment():
                 current_state = new_state
                 current_score = new_score
                 print("New best state found with score:", current_score)
-            else:
-                # Otherwise, with some probability, move to the new state anyway
-                prob = np.exp((new_score - current_score) / self.temperature)
-                if np.random.rand() < prob:
-                    current_state = new_state
-                    current_score = new_score
-                    print("New state found with score:", current_score)
+            # else:
+            #     # Otherwise, with some probability, move to the new state anyway
+            #     prob = np.exp((new_score - current_score) / self.temperature)
+            #     if np.random.rand() < prob:
+            #         current_state = new_state
+            #         current_score = new_score
+            #         print("New state found with score:", current_score)
 
         return current_state
 
@@ -194,9 +217,20 @@ class Experiment():
         """
         Makes small changes to the state of the simulation
         """
+        # Choose a random train and delete its stations from the list
         train = random.randrange(len(self.trains_list))
         del self.list_of_stations[train]
+
+        # Remove the minutes its used from the total minutes and empty its traject list
+        self.total -= self.trains_list[train].total_min
         self.trains_list[train].list_of_stations = []
+
+        # Reset its counters
+        self.trains_list[train].total_min = 0
+        self.trains_list[train].location = 0
+
+        # Change the trains that are being moved to the single train that is removed
+        self.trains_list = [self.trains_list[train]]
 
         
 
