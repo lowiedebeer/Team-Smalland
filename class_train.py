@@ -4,13 +4,13 @@ class Train():
 
     # Defining train_location, traject_length and destination
     def __init__(self, current_station, list_of_destinations):
-        self.current_station = current_station
-        self.previous = 0
-        self.list_of_stations = []
+        self.total_min = 0
+        self.already_taken = 0
         self.location = 0
+        self.list_of_stations = []
+        self.current_station = current_station
         self.list_of_destinations = list_of_destinations
         self.destination = self.destinations()
-        self.total_min = 0
 
 
     def destinations(self):
@@ -44,13 +44,14 @@ class Train():
 
         # If the distance between the train and the station is 0 add it to the list of stations
         if self.destination[1] - self.location == 0:
-            self.previous = self.current_station
             self.list_of_stations.append({self.current_station, self.destination[0]})
             self.current_station = self.destination[0]
+            
             # Determining the next destination
             self.destination = self.destinations()
 
             # Resetting the counter for the location
             self.total_min += self.location
             self.location = 0
+
         return self.list_of_stations

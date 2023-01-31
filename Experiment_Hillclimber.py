@@ -17,17 +17,17 @@ class Experiment():
 
         # Read the csv-file with the geographical locations of the stations
         self.stations = pd.read_csv(stations)
+
         self.trains_list = []
         self.train_route_list = []
         self.list_of_stations = []
-        self.total = 0
+        self.remake_train = []
         self.connections = self.init_dicts()
         self.coordinates_dict = self.init_station_list()
         self.add_trains(number_of_trains)
         self.setup_plot()
         self.traject_counter = number_of_trains
-        self.temperature = 100
-    
+
     def add_trains(self, number_of_trains):
             """
             Adding trains from the imported train class
@@ -57,7 +57,7 @@ class Experiment():
                     train = Train(str(current_station[0]), self.connections)
                     self.trains_list.append(train)
                     outlying_stations.pop(current_station[0])
-                    
+
                     # If the max trains are reached stop
                     if counter == number_of_trains:
                         return
@@ -114,7 +114,19 @@ class Experiment():
         for train in self.trains_list:
             train.movement()
             train_list.append(train.list_of_stations)
-        
+
+        return train_list
+
+    def step_remake(self, remake_train):
+        train_list = []
+
+        # Loop over all the trains and use there movement definition
+        # Add all the trajects that they have ridden on to a list
+
+        for train in remake_train:
+            train.movement()
+            train_list.append(train.list_of_stations)
+
         return train_list
 
     def draw(self):
@@ -139,64 +151,85 @@ class Experiment():
         for i in range(len(self.connect['station1'])):
             x_values = [self.coordinates_dict[self.connect['station1'][i]][0], self.coordinates_dict[self.connect['station2'][i]][0]]
             y_values = [self.coordinates_dict[self.connect['station1'][i]][1], self.coordinates_dict[self.connect['station2'][i]][1]]
-            
+
             if {self.connect['station1'][i], self.connect['station2'][i]} in total_list:
                 self.ax.plot(x_values, y_values, 'ro', linestyle="-")
                 amount_used += 1
             else:
                 self.ax.plot(x_values, y_values, 'bo', linestyle="--")
-        
+
         plt.plot(x_list, y_list, 'go')
         plt.draw()
         plt.pause(0.01)
         self.ax.cla()
+
         return amount_used / len(self.connect['station1'])
 
-    def run(self, iterations):
+    def run(self, iterations, remake_train):
         """
         To run the experiment and get its results
         """
 
         total = 0
-        
-        # Loop over the iterations to set each step and draw each movement
-        for i in range(iterations):
-            stations = self.step()
-        
+        if len(remake_train) > 0:
+            for i in range(iterations):
+                stations = self.step_remake(remake_train)
+
+        else:
+            # Loop over the iterations to set each step and draw each movement
+            for i in range(iterations):
+                stations = self.step()
+
+        self.switch_trajects()
+
         # Add all the stations to a self object
         for station_train in stations:
             self.list_of_stations.append(station_train)
-        
+
         # Calculate the traject_percentage
         self.traject_percentage = self.draw()
 
         # Print the stations each train has been to
         for train in self.trains_list:
             total += train.total_min
-        
+
         # Making the total a self object
-        self.total += total
 
-        return 10000 * self.traject_percentage - (self.traject_counter * 100 + self.total)
+        print(self.traject_percentage, self.traject_counter, total)
+        return 10000 * self.traject_percentage - (self.traject_counter * 100 + total)
+
+    def switch_trajects(self):
+        """
+        When the experiment is over see if a double traject can be swapped to an unused traject
+        """
+        all_trajects = [train.list_of_stations for train in self.trains_list]
+        for i, current_traject in enumerate(all_trajects):
+            other_trajects = all_trajects[:i] + all_trajects[i+1:]
+            for station in current_traject:
+                if station in [traject for sublist in other_trajects for traject in sublist]:
+                    self.trains_list[i].already_taken += 1
 
 
-    def hill_climber(self, max_iterations):
+    def hill_climber(self, max_iterations, minutes):
         # Initialize the current state of the simulation
         current_state = self.get_state()
-        current_score = self.check_objective_function(current_state)
+        current_score = self.check_objective_function(current_state, minutes)
 
         for i in range(max_iterations):
             # Make small changes to the current state
             new_state = self.change_route(current_state)
 
             # Evaluate the objective function for the new state
-            new_score = self.check_objective_function(new_state)
+            new_score = self.check_objective_function(new_state, minutes)
 
             # If the new state is better than the current state, move to the new state
             if new_score > current_score:
                 current_state = new_state
                 current_score = new_score
                 print("New best state found with score:", current_score)
+            if self.traject_percentage == 1:
+                self.write_timetable()
+                return current_score
             # else:
             #     # Otherwise, with some probability, move to the new state anyway
             #     prob = np.exp((new_score - current_score) / self.temperature)
@@ -218,28 +251,39 @@ class Experiment():
         Makes small changes to the state of the simulation
         """
         # Choose a random train and delete its stations from the list
-        train = random.randrange(len(self.trains_list))
-        del self.list_of_stations[train]
+        train_count = 0
+        removable_train = 0
+        for train in range(len(self.trains_list)):
+            if self.trains_list[train].already_taken > train_count:
+                train_count = self.trains_list[train].already_taken
+                removable_train =  train
+            self.trains_list[train].already_taken = 0
 
-        # Remove the minutes its used from the total minutes and empty its traject list
-        self.total -= self.trains_list[train].total_min
-        self.trains_list[train].list_of_stations = []
+        if removable_train != 0:
+            del self.list_of_stations[removable_train]
+            # Remove the minutes its used from the total minutes and empty its traject list
+            self.trains_list[removable_train].list_of_stations = []
+            # Reset its counters
+            self.trains_list[removable_train].total_min = 0
+            self.trains_list[removable_train].location = 0
+            self.trains_list[removable_train].already_taken = 0
 
-        # Reset its counters
-        self.trains_list[train].total_min = 0
-        self.trains_list[train].location = 0
+            # Change the trains that are being moved to the single train that is removed
+            self.remake_train = [self.trains_list[removable_train]]
 
-        # Change the trains that are being moved to the single train that is removed
-        self.trains_list = [self.trains_list[train]]
+    def write_timetable(self):
+        train_number = 1
+        for train in self.trains_list:
+            print(f"Route of train {train_number}:")
+            print(train.list_of_stations)
+            train_number += 1
 
-        
-
-    def check_objective_function(self, state):
+    def check_objective_function(self, state, minutes):
         """
         Returns the value of the objective function for the given state
         """
 
-        return self.run(120)
+        return self.run(minutes, self.remake_train)
 
 
     def setup_plot(self):
@@ -248,12 +292,10 @@ class Experiment():
 
 scores = []
 for i in range(1):
-    my_experiment = Experiment(7,'ConnectiesHolland.csv', 'StationsHollandPositie.csv')
-    scores.append(my_experiment.hill_climber(120))
-    print(sum(scores) / len(scores))
-    print(max(scores))
-print(scores)
+    my_experiment = Experiment(17,'ConnectiesNationaal.csv', 'StationsNationaal.csv')
+    scores.append(my_experiment.hill_climber(1000, 180))
 
+print(scores)
 # plotting labelled histogram
 plt.hist(scores)
 plt.xlabel('Score')
