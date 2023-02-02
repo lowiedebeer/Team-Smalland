@@ -122,11 +122,13 @@ class Experiment():
         return train_list
 
     def step_remake(self, remake_train):
+        """
+        Run the step for a single train with a different list
+        """
         train_list = []
 
         # Loop over all the trains and use there movement definition
         # Add all the trajects that they have ridden on to a list
-
         for train in remake_train:
             train.movement()
             train_list.append(train.list_of_stations)
@@ -140,8 +142,6 @@ class Experiment():
 
         # Making a list of x and y values of the positions of the stations
         # to later be able to plot the stations.
-        x_list = list(self.stations['x'])
-        y_list = list(self.stations['y'])
         amount_used = 0
         total_list = []
         self.not_reached = []
@@ -154,20 +154,12 @@ class Experiment():
         # Loop over the connection between stations and check wether a connection
         # is already in the list of train routes. If yes, color red, if no color blue.
         for i in range(len(self.connect['station1'])):
-            x_values = [self.coordinates_dict[self.connect['station1'][i]][0], self.coordinates_dict[self.connect['station2'][i]][0]]
-            y_values = [self.coordinates_dict[self.connect['station1'][i]][1], self.coordinates_dict[self.connect['station2'][i]][1]]
-
             if {self.connect['station1'][i], self.connect['station2'][i]} in total_list:
-                # self.ax.plot(x_values, y_values, 'ro', linestyle="-")
                 amount_used += 1
+
             else:
                 self.not_reached.append({self.connect['station1'][i], self.connect['station2'][i]})
-                # self.ax.plot(x_values, y_values, 'bo', linestyle="--")
 
-        # plt.plot(x_list, y_list, 'go')
-        # plt.draw()
-        # plt.pause(0.01)
-        # self.ax.cla()
         return amount_used / len(self.connect['station1'])
 
     def run(self, iterations, remake_train):
@@ -176,6 +168,8 @@ class Experiment():
         """
 
         total = 0
+        
+        # Run a different step for the new train
         if len(remake_train) > 0:
             for i in range(iterations):
                 stations = self.step_remake(remake_train)
@@ -220,7 +214,11 @@ class Experiment():
                     self.trains_list[i].already_taken += 1
         
     def hill_climber(self, max_iterations, minutes):
+        """
+        The hillclimber of this project keeping the highest scores
+        """
         scores = []
+
         # Initialize the current state of the simulation
         current_state = self.get_state()
         current_score = self.check_objective_function(current_state, minutes)
@@ -232,26 +230,28 @@ class Experiment():
             # Evaluate the objective function for the new state
             new_score = self.check_objective_function(new_state, minutes)
             scores.append(new_score)
+            
             # If the new state is better than the current state, move to the new state
             if new_score > current_score:
                 current_state = new_state
                 current_score = new_score
                 print("New best state found with score:", current_score)
+
+            # If al trajects have been ridden on return the scores
             if self.traject_percentage == 1:
                 self.write_timetable()
                 return current_score, scores
-            # else:
-            #     # Otherwise, with some probability, move to the new state anyway
-            #     prob = np.exp((new_score - current_score) / self.temperature)
-            #     if np.random.rand() < prob:
-            #         current_state = new_state
-            #         current_score = new_score
-            #         print("New state found with score:", current_score)
+
         scores = 0
         return current_state, scores
 
     def write_timetable(self):
+        """
+        Correct output
+        """
         train_number = 1
+
+        # Printing each train their traject
         for train in self.trains_list:
             print(f"Route of train {train_number}:")
             print(train.list_of_stations)
@@ -265,13 +265,18 @@ class Experiment():
 
     def remake(self, stations):
         """
+        Starting the train on an unused odd connected station
         """
+        # Randomly chosing a station from the dictionary
         current_station = random.sample(self.odd_connections_dic.keys(), 1)
         train = Train(str(current_station[0]), self.connections)
+
+        # While this station is already in the stations choose a new station
         while train.current_station in stations:
             current_station = random.sample(self.odd_connections_dic.keys(), 1)
             train = Train(str(current_station[0]), self.connections)
         
+        # Assign the new train
         self.trains_list.append(train)
 
         self.remake_train = [train]
@@ -298,16 +303,15 @@ class Experiment():
         # If the train is in the train list remove train
         if removable_train != -1:
             del self.list_of_stations[removable_train], self.trains_list[removable_train]
-            # Remove the minutes its used from the total minutes and empty its traject list
 
+            # Getting a dictionary from all the stations
             all_trajects = [train.list_of_stations for train in self.trains_list]
-
             all_stations = dict()
+
             for current_traject in all_trajects:
                 all_stations.update(current_traject)
 
             # Change the trains that are being moved to the single train that is removed
-            # self.remake_train = [self.trains_list[removable_train]]
             self.remake(all_stations)
         else:
             return print("Not Possible")
